@@ -26,8 +26,8 @@ during the mision.
 
 If you use these configurations for any analysis, please make note of
 the file version number and the corresponding reference
-design. Current version 0.0.0 of the summary files uses Swarm
-Reference Design 5, Flight System Transfer Trajectory 0x2a4, dated
-2024-01-26.
+design. Current version 0.1.0 of the summary files uses Swarm
+Reference Design 5B, Flight System Transfer Trajectory 0x75b, dated
+2024-06-24.
 
 Most other details of the file format are in the CDF attributes.

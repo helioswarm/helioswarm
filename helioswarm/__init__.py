@@ -71,7 +71,7 @@ def make_summary_skeleton(outdir="."):
         "TEXT": [
             "Summary data, including Observatory configuration, for"
             " the HelioSwarm Phase B concept Design Reference Mission.",
-            "Phase B Swarm Reference Design 5, Flight System Transfer Trajectory 0x2a4, 2024-01-26"
+            "Phase B Swarm Reference Design 5B, Flight System Transfer Trajectory 0x75b, 2024-06-24"
         ],
         "Time_resolution": ["1 hour"],
         "TITLE": ["HelioSwarm Concept Summary"],
@@ -239,7 +239,8 @@ def read_positions(directory):
     """
     dates, positions = [], []
     for i in range(9):
-        with open(os.path.join(directory, f"n{i}.txt"), "rb") as f:  # binary so tell() works
+        fname = f"Node{i}_preProcessed.txt" if i else "Chief.txt"
+        with open(os.path.join(directory, fname), "rb") as f:  # binary so tell() works
             l = b""
             while not l.startswith(b"------"):  # Scan past header
                 l = next(f)
@@ -265,7 +266,6 @@ def read_positions(directory):
             )
             f.seek(pos, os.SEEK_SET)
             positions.append(numpy.genfromtxt(f, delimiter=widths, usecols=(1, 2, 3)))
-    # Truncate to smallest time coverage (N5 currently)
     length = min([len(d) for d in dates])
     dates = [d[:length] for d in dates]
     positions = [p[:length, :] for p in positions]
