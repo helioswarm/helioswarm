@@ -70,7 +70,8 @@ def make_summary_skeleton(outdir="."):
         "Source_name": ["HSC>HelioSwarm Concept"],
         "TEXT": [
             "Summary data, including Observatory configuration, for"
-            " the HelioSwarm Phase B concept Design Reference Mission."
+            " the HelioSwarm Phase B concept Design Reference Mission.",
+            "Phase B Swarm Reference Design 5, Flight System Transfer Trajectory 0x2a4, 2024-01-26"
         ],
         "Time_resolution": ["1 hour"],
         "TITLE": ["HelioSwarm Concept Summary"],
