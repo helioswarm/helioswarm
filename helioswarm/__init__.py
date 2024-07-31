@@ -18,6 +18,11 @@ def make_summary_skeleton(outdir="."):
     ----------
     outdir : str
         Path to directory to hold skeleton CDF
+
+    Returns
+    -------
+    str
+        Full path to the skeleton CDF
     """
     global_attrs = {
         "Acknowledgement": ["Cite Klein et al (2023)."],
@@ -240,3 +245,28 @@ def read_positions(directory):
     pos_out[:, 8, :] = positions[0]
     pos_out[:, :8, :] = numpy.stack(positions[1:], axis=1)
     return dates[0], pos_out
+
+
+def write_drm(in_directory, out_directory):
+    """Write CDFs of the DRM
+
+    Parameters
+    ----------
+    in_directory : str
+        Directory containing the DRM input files
+    out_directory : str
+        Directory to hold the output files
+    """
+    skeleton = make_summary_skeleton(out_directory)
+    dates, positions = read_positions(in_directory)
+    yyyymm = numpy.vectorize(lambda x: x.year * 100 + x.month)(dates)
+    starts = numpy.concatenate(([0], numpy.nonzero(numpy.diff(yyyymm))[0] + 1))
+    stops = numpy.concatenate((starts[1:], [yyyymm.shape[0]]))
+    for start, stop in zip(starts, stops):
+        outcdf = os.path.join(out_directory, f"hsconcept_l2-summary_{yyyymm[start]}01_v0.0.0.cdf")
+        with spacepy.pycdf.CDF(outcdf, skeleton) as f:
+            f["Epoch"][...] = dates[start:stop]
+            f["Position"][:, 1:, :] = positions[start:stop, ...]
+            ntimes = stop - start
+            # "spacecraft 0" is fill
+            f["Position"][:, 0, :] = numpy.full((ntimes, 3), -1e31)
