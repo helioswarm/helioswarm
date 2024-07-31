@@ -76,6 +76,32 @@ def make_summary_skeleton(outdir="."):
         "TITLE": ["HelioSwarm Concept Summary"],
     }
     variables = {
+        "Baseline": {
+            "attrs": {
+                "CATDESC": "Relative baselines",
+                "DEPEND_0": "Epoch",
+                "DEPEND_1": "Spacecraft_Number",
+                "DEPEND_2": "Spacecraft_Number",
+                "DEPEND_3": "Cartesian_Number",
+                "DICT_KEY": "position",
+                "DISPLAY_TYPE": "time_series",
+                "FIELDNAM": "Baseline",
+                "LABLAXIS": "Baseline",
+                "LABL_PTR_1": "Spacecraft_Label",
+                "LABL_PTR_2": "Spacecraft_Label",
+                "LABL_PTR_3": "Cartesian_Label",
+                "SCALEMAX": 2500,
+                "SCALEMIN": 2500,
+                "UNITS": "km",
+                "VALIDMAX": 6000,
+                "VALIDMIN": 6000,
+                "VAR_NOTES": "Directed vector from first index to second index, e.g. [3, 4, 1] is"
+                " Y component of vector pointing from N3 to N4.",
+                "VAR_TYPE": "data",
+            },
+            "dims": (10, 10, 3),
+            "type": spacepy.pycdf.const.CDF_REAL4,
+        },
         "Cartesian_Label": {
             "data": spacepy.dmarray(
                 ["X", "Y", "Z"],
@@ -259,6 +285,10 @@ def write_drm(in_directory, out_directory):
     """
     skeleton = make_summary_skeleton(out_directory)
     dates, positions = read_positions(in_directory)
+    # Vector points from first index to second index
+    head = numpy.repeat(positions, 9, axis=0).reshape(-1, 9, 9, 3)
+    tail = numpy.repeat(positions, 9, axis=1).reshape(-1, 9, 9, 3)
+    baselines = head - tail
     yyyymm = numpy.vectorize(lambda x: x.year * 100 + x.month)(dates)
     starts = numpy.concatenate(([0], numpy.nonzero(numpy.diff(yyyymm))[0] + 1))
     stops = numpy.concatenate((starts[1:], [yyyymm.shape[0]]))
@@ -267,6 +297,9 @@ def write_drm(in_directory, out_directory):
         with spacepy.pycdf.CDF(outcdf, skeleton) as f:
             f["Epoch"][...] = dates[start:stop]
             f["Position"][:, 1:, :] = positions[start:stop, ...]
+            f["Baseline"][:, 1:, 1:, :] = baselines[start:stop, ...]
             ntimes = stop - start
             # "spacecraft 0" is fill
             f["Position"][:, 0, :] = numpy.full((ntimes, 3), -1e31)
+            f["Baseline"][:, 0, :, :] = numpy.full((ntimes, 10, 3), -1e31)
+            f["Baseline"][:, :, 0, :] = numpy.full((ntimes, 10, 3), -1e31)
