@@ -136,10 +136,10 @@ def make_summary_skeleton(outdir="."):
                 "LABL_PTR_1": "Spacecraft_Label",
                 "LABL_PTR_2": "Cartesian_Label",
                 "SCALEMAX": 383000,  # 60 Re apogee sci orbit
-                "SCALEMIN": 105000,  # 17 Re perigee sci orbit
+                "SCALEMIN": -383000,
                 "UNITS": "km",
                 "VALIDMAX": 520000,  # 80Re after first lunar swingby
-                "VALIDMIN": 6000,  # above ground
+                "VALIDMIN": -520000,
                 "VAR_TYPE": "data",
             },
             "dims": (10, 3),
