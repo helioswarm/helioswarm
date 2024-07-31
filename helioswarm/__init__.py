@@ -1,6 +1,7 @@
 """Main HelioSwarm package"""
 
 import datetime
+import os
 import os.path
 
 import numpy
@@ -185,3 +186,57 @@ def make_summary_skeleton(outdir="."):
             if a is not None:
                 v.attrs.update(a)
     return fspec
+
+
+def read_positions(directory):
+    """Read all DRM position files
+
+    Parameters
+    ----------
+    directory : str
+        Directory containing DRM position files
+
+    Returns
+    -------
+    tuple
+        `ndarray` of times and `ndarray` of positions (time, 9, 3). Hub last.
+    """
+    dates, positions = [], []
+    for i in range(9):
+        with open(os.path.join(directory, f"n{i}.txt"), "rb") as f:  # binary so tell() works
+            l = b""
+            while not l.startswith(b"------"):  # Scan past header
+                l = next(f)
+            # Underlining is not same width as field, start field at end of previous underline
+            colstart = [j for j in range(len(l)) if j == 0 or l[j - 1] == 45 and l[j] == 32] + [
+                len(l.rstrip())
+            ]
+            widths = [colstart[i + 1] - colstart[i] for i in range(len(colstart) - 1)]
+            pos = f.tell()
+            # This is NOT PORTABLE across locales, %b is locale-dependent
+            dates.append(
+                numpy.genfromtxt(
+                    f,
+                    delimiter=widths,
+                    converters={
+                        0: lambda x: datetime.datetime.strptime(
+                            x.decode("ascii"), "%d %b %Y %H:%M:%S.%f"
+                        )
+                    },
+                    dtype=object,
+                    usecols=(0,),
+                )
+            )
+            f.seek(pos, os.SEEK_SET)
+            positions.append(numpy.genfromtxt(f, delimiter=widths, usecols=(1, 2, 3)))
+    # Truncate to smallest time coverage (N5 currently)
+    length = min([len(d) for d in dates])
+    dates = [d[:length] for d in dates]
+    positions = [p[:length, :] for p in positions]
+    for i in range(1, 9):
+        if (dates[i] != dates[0]).any():
+            raise ValueError(f"N{i} dates do not match hub.")
+    pos_out = numpy.empty(shape=(len(dates[0]), 9, 3), dtype=positions[0].dtype)
+    pos_out[:, 8, :] = positions[0]
+    pos_out[:, :8, :] = numpy.stack(positions[1:], axis=1)
+    return dates[0], pos_out
