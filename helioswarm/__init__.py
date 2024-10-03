@@ -106,7 +106,7 @@ def make_summary_skeleton(outdir="."):
             },
             "compress": spacepy.pycdf.const.GZIP_COMPRESSION,
             "compress_param": 7,
-            "dims": (10, 10, 3),
+            "dims": (9, 9, 3),
             "type": spacepy.pycdf.const.CDF_REAL4,
         },
         "Cartesian_Label": {
@@ -177,12 +177,12 @@ def make_summary_skeleton(outdir="."):
             },
             "compress": spacepy.pycdf.const.GZIP_COMPRESSION,
             "compress_param": 7,
-            "dims": (10, 3),
+            "dims": (9, 3),
             "type": spacepy.pycdf.const.CDF_REAL4,
         },
         "Spacecraft_Label": {
             "data": spacepy.dmarray(
-                ["N/A"] + [f"N{i}" for i in range(1, 9)] + ["H"],
+                ["H"] + [f"N{i}" for i in range(1, 9)],
                 attrs={
                     "CATDESC": "Spacecraft label",
                     "DICT_KEY": "label",
@@ -194,18 +194,18 @@ def make_summary_skeleton(outdir="."):
         },
         "Spacecraft_Number": {
             "data": spacepy.dmarray(
-                [-128] + list(range(1, 10)),
+                list(range(9)),
                 dtype=numpy.int8,
                 attrs={
                     "CATDESC": "Spacecraft number",
                     "DICT_KEY": "number",
                     "FIELDNAM": "Spacecraft number",
                     "LABLAXIS": "S/C",
-                    "SCALEMAX": 10,
-                    "SCALEMIN": 0,
-                    "VALIDMAX": 9,
-                    "VALIDMIN": 1,
-                    "VAR_NOTES": "Nodes 1-8, hub 9, no s/c 0",
+                    "SCALEMAX": 9,
+                    "SCALEMIN": -1,
+                    "VALIDMAX": 8,
+                    "VALIDMIN": 0,
+                    "VAR_NOTES": "Hub 0, nodes 1-8.",
                     "VAR_TYPE": "support_data",
                 },
             ),
@@ -239,7 +239,7 @@ def read_positions(directory):
     Returns
     -------
     tuple
-        `ndarray` of times and `ndarray` of positions (time, 9, 3). Hub last.
+        `ndarray` of times and `ndarray` of positions (time, 9, 3). Hub first.
     """
     dates, positions = [], []
     for i in range(9):
@@ -273,9 +273,7 @@ def read_positions(directory):
     for i in range(1, 9):
         if (dates[i] != dates[0]).any():
             raise ValueError(f"N{i} dates do not match hub.")
-    pos_out = numpy.empty(shape=(len(dates[0]), 9, 3), dtype=positions[0].dtype)
-    pos_out[:, 8, :] = positions[0]
-    pos_out[:, :8, :] = numpy.stack(positions[1:], axis=1)
+    pos_out = numpy.stack(positions, axis=1)
     return dates[0], pos_out
 
 
@@ -302,10 +300,5 @@ def write_summary(in_directory, out_directory):
         outcdf = os.path.join(out_directory, f"hsconcept_l2-summary_{yyyymm[start]}01_v0.2.0.cdf")
         with spacepy.pycdf.CDF(outcdf, skeleton) as f:
             f["Epoch"][...] = dates[start:stop]
-            f["Position"][:, 1:, :] = positions[start:stop, ...]
-            f["Baseline"][:, 1:, 1:, :] = baselines[start:stop, ...]
-            ntimes = stop - start
-            # "spacecraft 0" is fill
-            f["Position"][:, 0, :] = numpy.full((ntimes, 3), -1e31)
-            f["Baseline"][:, 0, :, :] = numpy.full((ntimes, 10, 3), -1e31)
-            f["Baseline"][:, :, 0, :] = numpy.full((ntimes, 10, 3), -1e31)
+            f["Position"][...] = positions[start:stop, ...]
+            f["Baseline"][...] = baselines[start:stop, ...]
