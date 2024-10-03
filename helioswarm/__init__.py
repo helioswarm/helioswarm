@@ -96,10 +96,10 @@ def make_summary_skeleton(outdir="."):
                 "LABL_PTR_2": "Spacecraft_Label",
                 "LABL_PTR_3": "Cartesian_Label",
                 "SCALEMAX": 2500,
-                "SCALEMIN": 2500,
+                "SCALEMIN": -2500,
                 "UNITS": "km",
-                "VALIDMAX": 6000,
-                "VALIDMIN": 6000,
+                "VALIDMAX": 15000,
+                "VALIDMIN": -15000,
                 "VAR_NOTES": "Directed vector from first index to second index, e.g. [3, 4, 1] is"
                 " Y component of vector pointing from N3 to N4.",
                 "VAR_TYPE": "data",
@@ -297,8 +297,10 @@ def write_summary(in_directory, out_directory):
     starts = numpy.concatenate(([0], numpy.nonzero(numpy.diff(yyyymm))[0] + 1))
     stops = numpy.concatenate((starts[1:], [yyyymm.shape[0]]))
     for start, stop in zip(starts, stops):
-        outcdf = os.path.join(out_directory, f"hsconcept_l2-summary_{yyyymm[start]}01_v0.2.0.cdf")
+        logical_fileid = f"hsconcept_l2-summary_{yyyymm[start]}01_v0.2.0"
+        outcdf = os.path.join(out_directory, f"{logical_fileid}.cdf")
         with spacepy.pycdf.CDF(outcdf, skeleton) as f:
+            f.attrs["Logical_file_id"] = [logical_fileid]
             f["Epoch"][...] = dates[start:stop]
             f["Position"][...] = positions[start:stop, ...]
             f["Baseline"][...] = baselines[start:stop, ...]
