@@ -229,12 +229,12 @@ def make_summary_skeleton(outdir="."):
 
 
 def read_positions(directory):
-    """Read all DRM position files
+    """Read all representative trajectory position files
 
     Parameters
     ----------
     directory : str
-        Directory containing DRM position files
+        Directory containing representative trajectory position files
 
     Returns
     -------
@@ -279,13 +279,13 @@ def read_positions(directory):
     return dates[0], pos_out
 
 
-def write_drm(in_directory, out_directory):
-    """Write CDFs of the DRM
+def write_summary(in_directory, out_directory):
+    """Write CDFs of the summary file
 
     Parameters
     ----------
     in_directory : str
-        Directory containing the DRM input files
+        Directory containing the representative trajectory input files
     out_directory : str
         Directory to hold the output files
     """
