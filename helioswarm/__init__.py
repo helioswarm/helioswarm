@@ -107,7 +107,7 @@ def make_summary_skeleton(outdir="."):
             "compress": spacepy.pycdf.const.GZIP_COMPRESSION,
             "compress_param": 7,
             "dims": (9, 9, 3),
-            "type": spacepy.pycdf.const.CDF_REAL4,
+            "type": spacepy.pycdf.const.CDF_REAL8,
         },
         "Cartesian_Label": {
             "data": spacepy.dmarray(
@@ -178,7 +178,7 @@ def make_summary_skeleton(outdir="."):
             "compress": spacepy.pycdf.const.GZIP_COMPRESSION,
             "compress_param": 7,
             "dims": (9, 3),
-            "type": spacepy.pycdf.const.CDF_REAL4,
+            "type": spacepy.pycdf.const.CDF_REAL8,
         },
         "Spacecraft_Label": {
             "data": spacepy.dmarray(
