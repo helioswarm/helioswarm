@@ -27,7 +27,7 @@ def make_summary_skeleton(outdir="."):
     global_attrs = {
         "Acknowledgement": ["Cite Klein et al (2023)."],
         "Data_type": ["L2-summary>Level 2 summary parameters"],
-        "Data_version": ["0.0.0"],
+        "Data_version": ["0.2.0"],
         "Descriptor": ["HSC>HelioSwarm Concept"],
         "Discipline": [
             "Space Physics>Interplanetary Studies",
@@ -35,7 +35,7 @@ def make_summary_skeleton(outdir="."):
         ],
         "File_naming_convention": ["source_descriptor_datatype"],
         "Generated_by": ["Jonathan Niehof"],
-        "Generation_date": ["20240730"],
+        "Generation_date": ["20241003"],
         "HTTP_LINK": [
             "https://link.springer.com/article/10.1007/s11214-023-01019-0",
             "https://zenodo.org/doi/10.5281/zenodo.3252523",
@@ -56,7 +56,7 @@ def make_summary_skeleton(outdir="."):
             "spacepy.",
             "GitHub.",
         ],
-        "Logical_file_id": ["hsconcept_l2-summary_00000000_v0.0.0"],
+        "Logical_file_id": ["hsconcept_l2-summary_00000000_v0.2.0"],
         "Logical_source": ["hsconcept_l2-summary"],
         "Logical_source_description": ["HelioSwarm Concept Level 2 Summary"],
         "MODS": [],
@@ -64,14 +64,18 @@ def make_summary_skeleton(outdir="."):
         "PI_affiliation": ["University of New Hampshire"],
         "PI_name": ["Harlan Spence"],
         "Project": ["MIDEX>Medium-Class Explorers"],
-        #        'Rules_of_use': [],
-        "Skeleton_version": ["0.0.0"],
-        "Software_version": ["0.0.0"],
+        "Rules_of_use": [
+            "Licensed under CC0.",
+            "Cite doi:10.5281/zenodo.13887062.",
+            "Redistribution is discouraged.",
+        ],
+        "Skeleton_version": ["0.2.0"],
+        "Software_version": ["0.2.0"],
         "Source_name": ["HSC>HelioSwarm Concept"],
         "TEXT": [
             "Summary data, including Observatory configuration, for"
-            " the HelioSwarm Phase B concept Design Reference Mission.",
-            "Phase B Swarm Reference Design 5B, Flight System Transfer Trajectory 0x75b, 2024-06-24"
+            " HelioSwarm representative trajectories.",
+            "Phase B Swarm Reference Design 5B, Flight System Transfer Trajectory 0x75b, 2024-06-24",
         ],
         "Time_resolution": ["1 hour"],
         "TITLE": ["HelioSwarm Concept Summary"],
@@ -298,7 +302,7 @@ def write_drm(in_directory, out_directory):
     starts = numpy.concatenate(([0], numpy.nonzero(numpy.diff(yyyymm))[0] + 1))
     stops = numpy.concatenate((starts[1:], [yyyymm.shape[0]]))
     for start, stop in zip(starts, stops):
-        outcdf = os.path.join(out_directory, f"hsconcept_l2-summary_{yyyymm[start]}01_v0.0.0.cdf")
+        outcdf = os.path.join(out_directory, f"hsconcept_l2-summary_{yyyymm[start]}01_v0.2.0.cdf")
         with spacepy.pycdf.CDF(outcdf, skeleton) as f:
             f["Epoch"][...] = dates[start:stop]
             f["Position"][:, 1:, :] = positions[start:stop, ...]
