@@ -270,9 +270,6 @@ def read_positions(directory):
             )
             f.seek(pos, os.SEEK_SET)
             positions.append(numpy.genfromtxt(f, delimiter=widths, usecols=(1, 2, 3)))
-    length = min([len(d) for d in dates])
-    dates = [d[:length] for d in dates]
-    positions = [p[:length, :] for p in positions]
     for i in range(1, 9):
         if (dates[i] != dates[0]).any():
             raise ValueError(f"N{i} dates do not match hub.")
