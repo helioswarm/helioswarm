@@ -211,6 +211,28 @@ def make_summary_skeleton(outdir="."):
             ),
             "recVary": False,
         },
+        "True_Anomaly": {
+            "attrs": {
+                "CATDESC": "True anomaly",
+                "DEPEND_0": "Epoch",
+                "DEPEND_1": "Spacecraft_Number",
+                "DICT_KEY": "angle>rotation",
+                "DISPLAY_TYPE": "time_series",
+                "FIELDNAM": "True anomaly",
+                "LABLAXIS": "f",
+                "LABL_PTR_1": "Spacecraft_Label",
+                "SCALEMAX": 360,
+                "SCALEMIN": -0,
+                "UNITS": "degrees",
+                "VALIDMAX": 360,
+                "VALIDMIN": 0,
+                "VAR_TYPE": "data",
+            },
+            "compress": spacepy.pycdf.const.GZIP_COMPRESSION,
+            "compress_param": 7,
+            "dims": (9,),
+            "type": spacepy.pycdf.const.CDF_REAL4,
+        },
     }
     ver = global_attrs["Skeleton_version"][0]
     fspec = os.path.join(outdir, global_attrs["Logical_source"][0] + "_00000000_v" + ver + ".cdf")
@@ -239,9 +261,10 @@ def read_positions(directory):
     Returns
     -------
     tuple
-        `ndarray` of times and `ndarray` of positions (time, 9, 3). Hub first.
+        `ndarray` of times,  `ndarray` of positions (time, 9, 3), `ndarray`
+        of true anomaly (degrees) (time, 9). Hub first.
     """
-    dates, positions = [], []
+    dates, positions, true_anom = [], [], []
     for i in range(9):
         fname = f"Node{i}_preProcessed.txt" if i else "Chief.txt"
         with open(os.path.join(directory, fname), "rb") as f:  # binary so tell() works
@@ -270,11 +293,14 @@ def read_positions(directory):
             )
             f.seek(pos, os.SEEK_SET)
             positions.append(numpy.genfromtxt(f, delimiter=widths, usecols=(1, 2, 3)))
+            f.seek(pos, os.SEEK_SET)
+            true_anom.append(numpy.genfromtxt(f, delimiter=widths, usecols=(5,)))
     for i in range(1, 9):
         if (dates[i] != dates[0]).any():
             raise ValueError(f"N{i} dates do not match hub.")
     pos_out = numpy.stack(positions, axis=1)
-    return dates[0], pos_out
+    true_anom = numpy.stack(true_anom, axis=1)
+    return dates[0], pos_out, true_anom
 
 
 def write_summary(in_directory, out_directory):
@@ -288,7 +314,7 @@ def write_summary(in_directory, out_directory):
         Directory to hold the output files
     """
     skeleton = make_summary_skeleton(out_directory)
-    dates, positions = read_positions(in_directory)
+    dates, positions, true_anom = read_positions(in_directory)
     # Vector points from first index to second index
     head = numpy.repeat(positions, 9, axis=0).reshape(-1, 9, 9, 3)
     tail = numpy.repeat(positions, 9, axis=1).reshape(-1, 9, 9, 3)
@@ -304,3 +330,4 @@ def write_summary(in_directory, out_directory):
             f["Epoch"][...] = dates[start:stop]
             f["Position"][...] = positions[start:stop, ...]
             f["Baseline"][...] = baselines[start:stop, ...]
+            f["True_Anomaly"][...] = true_anom[start:stop, ...]
