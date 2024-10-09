@@ -35,7 +35,7 @@ def make_summary_skeleton(outdir="."):
         ],
         "File_naming_convention": ["source_descriptor_datatype"],
         "Generated_by": ["Jonathan Niehof"],
-        "Generation_date": ["20241003"],
+        "Generation_date": ["20241009"],
         "HTTP_LINK": [
             "https://link.springer.com/article/10.1007/s11214-023-01019-0",
             "https://zenodo.org/doi/10.5281/zenodo.3252523",
