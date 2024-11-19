@@ -44,17 +44,28 @@ def read_cdf_directory(directory):
     """Read and concatenate Position and Epoch data from all CDF files in the specified directory."""
     position_data_list = []
     epoch_data_list = []
-    
-    for file_name in os.listdir(directory):
-        if file_name.endswith('.cdf'):
-            file_path = os.path.join(directory, file_name)
-            with pycdf.CDF(file_path) as cdf:
-                position_data_list.append(cdf['Position'][:])
-                epoch_data_list.append(cdf['Epoch'][:])
-    
+
+    # Sort file names in ascending order
+    sorted_files = sorted(
+        [file_name for file_name in os.listdir(directory) if file_name.endswith('.cdf')]
+    )
+
+    for file_name in sorted_files:
+        file_path = os.path.join(directory, file_name)
+        with pycdf.CDF(file_path) as cdf:
+            position_data_list.append(cdf['Position'][:])
+            epoch_data_list.append(cdf['Epoch'][:])
+        
     # Concatenate all data
     position_data = np.concatenate(position_data_list, axis=0)
     epoch_data = np.concatenate(epoch_data_list, axis=0)
+
+    first_time = epoch_data[0]
+    last_time = epoch_data[-1]
+
+    # Print the first and last times
+    print(f"First time: {first_time}")
+    print(f"Last time: {last_time}")
     
     return position_data, epoch_data
 
@@ -93,7 +104,11 @@ def plot_positions(position_data, epoch_data, closest_index):
 
     # Set panels for plot
     fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8), (ax9, ax10, ax11, ax12)) = plt.subplots(
-        3, 4, figsize=(16, 8), gridspec_kw={'width_ratios': [1, 1, 1, 1], 'height_ratios': [1, 1, 1]}
+        3, 4, figsize=(16, 8),
+        gridspec_kw={'width_ratios': [1, 1, 1, 1], 'height_ratios': [1, 1, 1], 
+                     'wspace' : 0.2,
+                     'hspace' : 0.5
+                     }
     )
 
     # hide (currenlty blank) ax8
@@ -365,5 +380,5 @@ def main(directory, target_time):
 
 # Usage example
 directory = '../HS-RT/PhB_SRD5B_0x75b/'  # Specify the directory containing CDF files
-target_time = '2029-09-21 12:00:00'  # Target time to find the closest hour
+target_time = '2029-08-07 06:00:00'  # Target time to find the closest hour
 main(directory, target_time)
