@@ -105,9 +105,7 @@ def plot_positions(position_data, epoch_data, closest_index):
     # Set panels for plot
     fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8), (ax9, ax10, ax11, ax12)) = plt.subplots(
         3, 4, figsize=(16, 8),
-        gridspec_kw={'width_ratios': [1, 1, 1, 1], 'height_ratios': [1, 1, 1], 
-                     'wspace' : 0.2,
-                     'hspace' : 0.5
+        gridspec_kw={'width_ratios': [1, 1, 1, 1], 'height_ratios': [1, 1, 1]                     
                      }
     )
 
@@ -359,8 +357,8 @@ def plot_positions(position_data, epoch_data, closest_index):
     ax12.set_xlim(0, 1.4)
     ax12.set_ylim(50, 5000)
     ax12.set_yscale('log')  # Set x-axis to log scale
-    ax12.set_xlabel('Characteristic Size (L)')
-    ax12.set_ylabel('$\sqrt{E^2 + P^2}$')
+    ax12.set_ylabel('Characteristic Size (km)')
+    ax12.set_xlabel('$\sqrt{E^2 + P^2}$')
     ax12.grid(True)
     ax12.set_title('Polyhedral Geometries')
     
