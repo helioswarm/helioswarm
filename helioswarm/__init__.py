@@ -27,7 +27,7 @@ def make_summary_skeleton(outdir="."):
     global_attrs = {
         "Acknowledgement": ["Cite Klein et al (2023)."],
         "Data_type": ["L2-summary>Level 2 summary parameters"],
-        "Data_version": ["0.2.0"],
+        "Data_version": ["0.3.0"],
         "Descriptor": ["HSC>HelioSwarm Concept"],
         "Discipline": [
             "Space Physics>Interplanetary Studies",
@@ -35,7 +35,7 @@ def make_summary_skeleton(outdir="."):
         ],
         "File_naming_convention": ["source_descriptor_datatype"],
         "Generated_by": ["Jonathan Niehof"],
-        "Generation_date": ["20241009"],
+        "Generation_date": ["20260611"],
         "HTTP_LINK": [
             "https://link.springer.com/article/10.1007/s11214-023-01019-0",
             "https://zenodo.org/doi/10.5281/zenodo.3252523",
@@ -56,7 +56,7 @@ def make_summary_skeleton(outdir="."):
             "spacepy.",
             "GitHub.",
         ],
-        "Logical_file_id": ["hsconcept_l2-summary_00000000_v0.2.0"],
+        "Logical_file_id": ["hsconcept_l2-summary_00000000_v0.3.0"],
         "Logical_source": ["hsconcept_l2-summary"],
         "Logical_source_description": ["HelioSwarm Concept Level 2 Summary"],
         "MODS": [],
@@ -69,13 +69,13 @@ def make_summary_skeleton(outdir="."):
             "Cite doi:10.5281/zenodo.13887062.",
             "Redistribution is discouraged.",
         ],
-        "Skeleton_version": ["0.2.0"],
-        "Software_version": ["0.2.0"],
+        "Skeleton_version": ["0.3.0"],
+        "Software_version": ["0.3.0"],
         "Source_name": ["HSC>HelioSwarm Concept"],
         "TEXT": [
             "Summary data, including Observatory configuration, for"
             " HelioSwarm representative trajectories.",
-            "Phase B Swarm Reference Design 5B, Flight System Transfer Trajectory 0x75b, 2024-06-24",
+            "Phase B Swarm Reference Design 8, Flight System Transfer Trajectory 0x78f, 2026-03-05",
         ],
         "Time_resolution": ["1 hour"],
         "TITLE": ["HelioSwarm Concept Summary"],
@@ -265,8 +265,12 @@ def read_positions(directory):
         of true anomaly (degrees) (time, 9). Hub first.
     """
     dates, positions, true_anom = [], [], []
+    old_names = os.path.isfile(os.path.join(directory, "Chief.txt"))
     for i in range(9):
-        fname = f"Node{i}_preProcessed.txt" if i else "Chief.txt"
+        if old_names:
+            fname = f"Node{i}_preProcessed.txt" if i else "Chief.txt"
+        else:
+            fname = f"n{i}.txt"
         with open(os.path.join(directory, fname), "rb") as f:  # binary so tell() works
             l = b""
             while not l.startswith(b"------"):  # Scan past header
@@ -323,7 +327,7 @@ def write_summary(in_directory, out_directory):
     starts = numpy.concatenate(([0], numpy.nonzero(numpy.diff(yyyymm))[0] + 1))
     stops = numpy.concatenate((starts[1:], [yyyymm.shape[0]]))
     for start, stop in zip(starts, stops):
-        logical_fileid = f"hsconcept_l2-summary_{yyyymm[start]}01_v0.2.0"
+        logical_fileid = f"hsconcept_l2-summary_{yyyymm[start]}01_v0.3.0"
         outcdf = os.path.join(out_directory, f"{logical_fileid}.cdf")
         with spacepy.pycdf.CDF(outcdf, skeleton) as f:
             f.attrs["Logical_file_id"] = [logical_fileid]
