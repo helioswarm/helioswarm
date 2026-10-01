@@ -55,7 +55,7 @@ def read_cdf_directory(directory):
         with pycdf.CDF(file_path) as cdf:
             position_data_list.append(cdf['Position'][:])
             epoch_data_list.append(cdf['Epoch'][:])
-        
+
     # Concatenate all data
     position_data = np.concatenate(position_data_list, axis=0)
     epoch_data = np.concatenate(epoch_data_list, axis=0)
@@ -66,7 +66,7 @@ def read_cdf_directory(directory):
     # Print the first and last times
     print(f"First time: {first_time}")
     print(f"Last time: {last_time}")
-    
+
     return position_data, epoch_data
 
 def find_closest_time_index(epoch_data, target_time):
@@ -105,13 +105,13 @@ def plot_positions(position_data, epoch_data, closest_index):
     # Set panels for plot
     fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8), (ax9, ax10, ax11, ax12)) = plt.subplots(
         3, 4, figsize=(16, 8),
-        gridspec_kw={'width_ratios': [1, 1, 1, 1], 'height_ratios': [1, 1, 1]                     
+        gridspec_kw={'width_ratios': [1, 1, 1, 1], 'height_ratios': [1, 1, 1]
                      }
     )
 
     # hide (currenlty blank) ax8
     ax8.remove()
-    
+
 
     # Set axis limits to ±65 Earth radii for the position plots
     axis_limit = 65
@@ -165,7 +165,7 @@ def plot_positions(position_data, epoch_data, closest_index):
 
     # Calculate the radius of the magnetopause circle in the (y, z) plane at x = 0
     R_yz = R0 * 2**ALPHA
-    
+
     # Plot the magnetopause circle in the (y, z) plane
     circle_yz = plt.Circle((0, 0), R_yz, color='k', linestyle='--', fill=False, label='Magnetopause Boundary')
     ax3.add_patch(circle_yz)
@@ -196,7 +196,7 @@ def plot_positions(position_data, epoch_data, closest_index):
         delta_x = position_data_window[:, i, 0] - position_data_window[:, 0, 0]  # Difference in x
         delta_y = position_data_window[:, i, 1] - position_data_window[:, 0, 1]  # Difference in y
         delta_z = position_data_window[:, i, 2] - position_data_window[:, 0, 2]  # Difference in z
-    
+
         # Plot the trajectory of separations
         ax5.plot(delta_x, delta_y, label=None, color=colors[i])
         # Highlight the central point
@@ -214,7 +214,7 @@ def plot_positions(position_data, epoch_data, closest_index):
 
     #Maximum hub to node separation
     delta_limit=1500
-        
+
     # Add labels, title, and grid
     ax5.set_xlabel('$\Delta X$ (km)')
     ax5.set_ylabel('$\Delta Y$ (km)')
@@ -246,19 +246,19 @@ def plot_positions(position_data, epoch_data, closest_index):
     # Assuming position_data_window contains the positions at the selected hour
     selected_hour_index = 12  # Index of the hour to analyze
     selected_positions = position_data_window[selected_hour_index, :, :]  # Shape: (9, 3)
-    
+
     # Loop over all pairs of spacecraft
     for i in range(9):  # Loop over the first spacecraft (0 through 8)
         for j in range(i + 1, 9):  # Loop over the second spacecraft (i+1 through 8)
             # Calculate the vector difference between spacecraft i and j
             separation = selected_positions[j, :] - selected_positions[i, :]
             delta_x, delta_y, delta_z = np.abs(separation[0]), np.abs(separation[1]), np.abs(separation[2])
-            
+
             # Plot the (x, y), (x,z) and (y,z) components of the separation
             ax9.plot(delta_x, delta_y, markersize=3, marker='o', color='black', label=None)
             ax10.plot(delta_x, delta_z, markersize=3, marker='o', color='black', label=None)
             ax11.plot(delta_y, delta_z, markersize=3, marker='o', color='black', label=None)
-            
+
     #range for inter spacecraft displacements
     disp_min=10
     disp_max=5000
@@ -266,7 +266,7 @@ def plot_positions(position_data, epoch_data, closest_index):
     #threshold values for kinetic and MHD transitions
     ion_line=100
     MHD_line=1200
-    
+
     ax9.set_xlabel('$\Delta X$ (km)')
     ax9.set_ylabel('$\Delta Y$ (km)')
     ax9.set_xlim(disp_min,disp_max)
@@ -325,7 +325,7 @@ def plot_positions(position_data, epoch_data, closest_index):
         a = np.sqrt(eigenvalues[0])  # Largest eigenvalue (size in the largest dimension)
         b = np.sqrt(eigenvalues[1])  # Second-largest eigenvalue
         c = np.sqrt(eigenvalues[2])  # Smallest eigenvalue
-        
+
         # Calculate characteristic size, elongation, and planarity using your definitions
         L = 2 * a  # Characteristic size
         E = 1 - (b / a)  # Elongation
@@ -338,14 +338,14 @@ def plot_positions(position_data, epoch_data, closest_index):
     L_values = [r[0] for r in results]  # Characteristic size (L)
     elongation_planarity = [np.sqrt(r[1]**2 + r[2]**2) for r in results]  # sqrt(E^2 + P^2)
     num_vertices = [r[3] for r in results]  # Number of vertices (M)
-        
+
     # Add the scatter plot to ax12
     scatter = ax12.scatter(
         elongation_planarity,
-        L_values, 
-        c=num_vertices, 
-        cmap=cmap, 
-        s=50, 
+        L_values,
+        c=num_vertices,
+        cmap=cmap,
+        s=50,
         alpha=0.8
     )
 
@@ -361,7 +361,7 @@ def plot_positions(position_data, epoch_data, closest_index):
     ax12.set_xlabel('$\sqrt{E^2 + P^2}$')
     ax12.grid(True)
     ax12.set_title('Polyhedral Geometries')
-    
+
     plt.tight_layout()
     plt.show()
 
@@ -369,10 +369,10 @@ def main(directory, target_time):
     """Main function to load data, find the closest time, and plot positions."""
     # Read and concatenate CDF data from directory
     position_data, epoch_data = read_cdf_directory(directory)
-    
+
     # Find the index of the closest time
     closest_index = find_closest_time_index(epoch_data, target_time)
-    
+
     # Plot the filtered data with a 12-hour window around the closest time
     plot_positions(position_data, epoch_data, closest_index)
 
