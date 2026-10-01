@@ -1,6 +1,6 @@
-[tool.black]
+[tool.ruff]
 line-length = 99
-target-version = ['py39', 'py310', 'py311', 'py312']
-include = '\.py$'
-required-version = 24
-fast = false
+extend-exclude = ["developer/scripts/*", "visualization/*"]
+
+[tool.ruff.lint]
+ignore = ["DTZ001", "DTZ007"]
