@@ -73,8 +73,10 @@ def make_summary_skeleton(outdir="."):
         "Software_version": ["0.3.0"],
         "Source_name": ["HSC>HelioSwarm Concept"],
         "TEXT": [
-            "Summary data, including Observatory configuration, for"
-            " HelioSwarm representative trajectories.",
+            (
+                "Summary data, including Observatory configuration, for"
+                " HelioSwarm representative trajectories."
+            ),
             "Phase B Swarm Reference Design 8, Flight System Transfer Trajectory 0x78f, 2026-03-05",
         ],
         "Time_resolution": ["1 hour"],
